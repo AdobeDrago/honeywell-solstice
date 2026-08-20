@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "projectType": "xwalk"
+  },
+  "templates": [
+    {
+      "name": "about-content-page",
+      "urls": [
+        "https://www.solstice.com/us/en/about-us/solstice-advanced-materials-history-and-brand-transition"
+      ],
+      "coverageGaps": [],
+      "description": "About Us content page with a left-rail tabbed navigation and body content covering company history and brand transition",
+      "blocks": [
+        {
+          "name": "tabs-left-rail",
+          "instances": [
+            ".cmp-leftrail-enhanced .left-rail-container-desktop"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Body Content",
+          "selector": "body > main > div.root.responsivegrid > div.aem-Grid.aem-Grid--12.aem-Grid--default--12 > div.responsivegrid.aem-GridColumn.aem-GridColumn--default--12",
+          "style": null,
+          "blocks": [
+            "tabs-left-rail"
+          ],
+          "defaultContent": [
+            ".left-rail-heading p.label1"
+          ]
+        }
+      ]
+    }
+  ]
+}

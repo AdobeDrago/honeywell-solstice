@@ -1,0 +1,40 @@
+{
+  "variantName": "tabs-left-rail",
+  "baseBlock": "tabs",
+  "version": "1.0.0",
+  "created": "2026-08-20T16:57:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.solstice.com/us/en/about-us/solstice-advanced-materials-history-and-brand-transition",
+    "originPage": "About Us - Solstice Advanced Materials history and brand transition content page",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "spacious",
+    "purpose": "vertical-tabs",
+    "imagePattern": "noimg"
+  },
+  "contentPattern": {
+    "structure": "vertical left-rail tab list + rich-text content panels",
+    "orientation": "vertical-left-rail",
+    "tabCount": 2,
+    "imageCount": 0
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "About/company info pages with a left-rail tabbed navigation",
+      "Text-heavy documentation split into a few named sections",
+      "Pages where tab labels stack vertically beside content"
+    ],
+    "notSuitableFor": [
+      "Horizontal top-tab layouts (use base tabs)",
+      "Media-heavy tab panels dominated by imagery",
+      "Large numbers of tabs where a horizontal strip is preferred"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/us/en/about-us/solstice-advanced-materials-history-and-brand-transition"],
+    "reuseCount": 1,
+    "lastUsed": "2026-08-20T16:57:00.000Z"
+  }
+}

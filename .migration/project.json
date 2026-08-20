@@ -1,0 +1,11 @@
+{
+  "type": "xwalk",
+  "sites": {
+    "honeywell-solstice": {
+      "previewOrg": "adobedrago",
+      "previewSite": "honeywell-solstice",
+      "contentHostUrl": "https://content.da.live/adobedrago/honeywell-solstice/",
+      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json"
+    }
+  }
+}

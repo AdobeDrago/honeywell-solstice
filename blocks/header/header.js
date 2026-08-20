@@ -175,7 +175,16 @@ async function buildBreadcrumbs() {
 export default async function decorate(block) {
   // load nav as fragment
   const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  let navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  // Local `aem up --html-folder content` serves this project's docs under
+  // /content/*; the nav fragment lives at /content/nav. Prefer it when present,
+  // falling back to /nav for production/default hosting.
+  if (!navMeta) {
+    try {
+      const localNav = await fetch('/content/nav.plain.html', { method: 'HEAD' });
+      if (localNav.ok) navPath = '/content/nav';
+    } catch (e) { /* fall back to /nav */ }
+  }
   const fragment = await loadFragment(navPath);
 
   // decorate nav DOM
