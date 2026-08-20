@@ -1,6 +1,8 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
+const codeBase = window.hlx?.codeBasePath || '';
+
 /**
  * loads and decorates the footer
  * @param {Element} block The footer block element
@@ -31,6 +33,45 @@ export default async function decorate(block) {
   columns.forEach((col, i) => {
     if (columnClasses[i]) col.classList.add(columnClasses[i]);
   });
+
+  // contact column: same-origin white logo on top + address anchored to bottom
+  const contact = footer.querySelector('.footer-contact');
+  if (contact) {
+    // drop any broken/external logo authored in content
+    contact.querySelectorAll('picture, img').forEach((el) => (el.closest('p') || el).remove());
+
+    const logo = document.createElement('a');
+    logo.className = 'footer-logo';
+    logo.href = '/';
+    logo.setAttribute('aria-label', 'Solstice home');
+    logo.innerHTML = `<img src="${codeBase}/icons/solstice-logo.png" alt="Solstice" loading="lazy">`;
+    contact.prepend(logo);
+
+    // group the address lines (everything after the CONTACT US button) so they
+    // can be pinned to the bottom of the column
+    const dcw = contact.querySelector('.default-content-wrapper');
+    const button = dcw?.querySelector('.button-container');
+    if (button) {
+      const address = document.createElement('div');
+      address.className = 'footer-address';
+      let node = button.nextElementSibling;
+      while (node) {
+        const next = node.nextElementSibling;
+        address.append(node);
+        node = next;
+      }
+      if (address.children.length) dcw.append(address);
+    }
+  }
+
+  // turn the LinkedIn text link into the purple social icon
+  const social = footer.querySelector('.footer-menu a[href*="linkedin"]');
+  if (social) {
+    social.classList.remove('button');
+    social.closest('.button-container')?.classList.replace('button-container', 'footer-social');
+    social.setAttribute('aria-label', social.textContent.trim() || 'LinkedIn');
+    social.innerHTML = `<img src="${codeBase}/icons/linkedin.svg" alt="" loading="lazy">`;
+  }
 
   block.append(footer);
 }
