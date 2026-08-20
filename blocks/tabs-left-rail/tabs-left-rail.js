@@ -1,58 +1,103 @@
+// Tabs (left-rail variant)
+// Desktop: a bordered left rail of tab buttons + a content panel to the right.
+// Mobile: an accordion — each button is full width and its panel expands
+// directly beneath it (all collapsed by default).
+
+const isDesktop = window.matchMedia('(min-width: 900px)');
+
 // keep track globally of the number of tab blocks on the page
 let tabBlockCnt = 0;
 
 export default async function decorate(block) {
-  // build tablist
-  const tablist = document.createElement('div');
-  tablist.className = 'tabs-left-rail-list';
-  tablist.setAttribute('role', 'tablist');
-  tablist.id = `tablist-${tabBlockCnt += 1}`;
+  tabBlockCnt += 1;
+  const rows = [...block.children].filter((row) => row.children.length >= 2);
 
-  // the first cell of each row is the title of the tab
-  const tabHeadings = [...block.children]
-    .filter((child) => child.firstElementChild && child.firstElementChild.children.length > 0)
-    .map((child) => child.firstElementChild);
+  const rail = document.createElement('div');
+  rail.className = 'tabs-left-rail-list';
+  rail.setAttribute('role', 'tablist');
+  rail.id = `tablist-${tabBlockCnt}`;
 
-  tabHeadings.forEach((tab, i) => {
-    const id = `tabpanel-${tabBlockCnt}-tab-${i + 1}`;
+  const buttons = [];
+  const panels = [];
 
-    // decorate tabpanel
-    const tabpanel = block.children[i];
-    tabpanel.className = 'tabs-left-rail-panel';
-    tabpanel.id = id;
-    tabpanel.setAttribute('aria-hidden', !!i);
-    tabpanel.setAttribute('aria-labelledby', `tab-${id}`);
-    tabpanel.setAttribute('role', 'tabpanel');
+  rows.forEach((row, i) => {
+    const id = `tlr-${tabBlockCnt}-${i + 1}`;
+    const [titleCell, contentCell] = row.children;
 
-    // build tab button
+    // the content cell becomes the tab panel
+    const panel = contentCell;
+    panel.className = 'tabs-left-rail-panel';
+    panel.id = `panel-${id}`;
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', `tab-${id}`);
+    panels.push(panel);
+
+    // group any "excerpt" run into a callout box (fallback when the content
+    // was not authored as a blockquote)
+    if (!panel.querySelector('blockquote')) {
+      const paras = [...panel.querySelectorAll(':scope > p')];
+      const marker = paras.find((p) => p.textContent.trim().toUpperCase() === 'RELEVANT FORM 10 EXCERPT');
+      if (marker) {
+        const callout = document.createElement('blockquote');
+        marker.before(callout);
+        let node = callout.nextElementSibling;
+        while (node) {
+          const next = node.nextElementSibling;
+          callout.append(node);
+          node = next;
+        }
+      }
+    }
+
+    // build the tab button from the title cell
     const button = document.createElement('button');
     button.className = 'tabs-left-rail-tab';
     button.id = `tab-${id}`;
-
-    button.innerHTML = tab.innerHTML;
-
-    button.setAttribute('aria-controls', id);
-    button.setAttribute('aria-selected', !i);
+    button.type = 'button';
     button.setAttribute('role', 'tab');
-    button.setAttribute('type', 'button');
+    button.setAttribute('aria-controls', `panel-${id}`);
+    button.innerHTML = titleCell.innerHTML;
+    buttons.push(button);
 
-    button.addEventListener('click', () => {
-      block.querySelectorAll('[role=tabpanel]').forEach((panel) => {
-        panel.setAttribute('aria-hidden', true);
-      });
-      tablist.querySelectorAll('button').forEach((btn) => {
-        btn.setAttribute('aria-selected', false);
-      });
-      tabpanel.setAttribute('aria-hidden', false);
-      button.setAttribute('aria-selected', true);
-    });
-
-    // add the new tab list button, to the tablist
-    tablist.append(button);
-
-    // remove the tab heading from the dom, which also removes it from the UE tree
-    tab.remove();
+    row.remove();
   });
 
-  block.prepend(tablist);
+  // panels live directly under the block; the rail/buttons are positioned by layout()
+  panels.forEach((panel) => block.append(panel));
+
+  let active = -1;
+
+  function render() {
+    buttons.forEach((btn, j) => {
+      const on = j === active;
+      btn.setAttribute('aria-selected', on);
+      btn.setAttribute('aria-expanded', on);
+      panels[j].setAttribute('aria-hidden', !on);
+    });
+  }
+
+  buttons.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      // desktop = tabs (always one selected); mobile = accordion (toggle)
+      active = (!isDesktop.matches && active === i) ? -1 : i;
+      render();
+    });
+  });
+
+  function layout() {
+    if (isDesktop.matches) {
+      buttons.forEach((btn) => rail.append(btn));
+      block.prepend(rail);
+      if (active === -1) active = 0; // desktop always shows a panel
+    } else {
+      rail.remove();
+      panels.forEach((panel, i) => panel.before(buttons[i]));
+    }
+    render();
+  }
+
+  // initial state: first tab open on desktop, all collapsed on mobile
+  active = isDesktop.matches ? 0 : -1;
+  layout();
+  isDesktop.addEventListener('change', layout);
 }
