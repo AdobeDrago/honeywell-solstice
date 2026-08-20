@@ -4,6 +4,8 @@ import { loadFragment } from '../fragment/fragment.js';
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
 
+const codeBase = window.hlx?.codeBasePath || '';
+
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
@@ -169,6 +171,70 @@ async function buildBreadcrumbs() {
 }
 
 /**
+ * Turns author-friendly links that were auto-decorated as buttons back into
+ * plain nav links (the header renders text links, not pill buttons).
+ * @param {Element} scope The element to clean up
+ */
+function stripButtons(scope) {
+  if (!scope) return;
+  scope.querySelectorAll('a.button').forEach((a) => a.classList.remove('button'));
+  scope.querySelectorAll('.button-container').forEach((p) => p.classList.remove('button-container'));
+}
+
+/**
+ * Returns markup for an icon rendered as a same-origin <img> (so it is never
+ * broken by the media pipeline and can be forced white on the dark bands).
+ * @param {string} name icon file name without extension
+ * @returns {string}
+ */
+function iconMarkup(name) {
+  return `<span class="icon icon-${name}"><img src="${codeBase}/icons/${name}.svg" alt="" loading="lazy"></span>`;
+}
+
+/**
+ * Prepends an icon to a link if it does not already have one.
+ * @param {Element} link
+ * @param {string} name icon file name without extension
+ */
+function ensureLeadingIcon(link, name) {
+  if (!link || link.querySelector('.icon')) return;
+  link.insertAdjacentHTML('afterbegin', iconMarkup(name));
+}
+
+/**
+ * Builds the shopping-cart control shown in the utility bar.
+ * @returns {HTMLElement}
+ */
+function buildCart() {
+  const cart = document.createElement('a');
+  cart.className = 'nav-cart';
+  cart.href = '/us/en/cart';
+  cart.setAttribute('aria-label', 'Cart');
+  cart.innerHTML = iconMarkup('cart');
+  return cart;
+}
+
+/**
+ * Places the utility links in the top black bar (desktop) or inside the
+ * expandable mobile menu (mobile), keeping a single source of truth.
+ * @param {Element} nav The main nav element (#nav)
+ * @param {Element} utilityInner The inner wrapper of the black utility band
+ * @param {Element} utility The utility links element (.nav-utility)
+ */
+function placeUtility(nav, utilityInner, utility) {
+  if (!utility) return;
+  if (isDesktop.matches) {
+    // top black bar, ahead of the cart control
+    utilityInner.prepend(utility);
+  } else {
+    // inside the mobile overlay, below the main sections
+    const navSections = nav.querySelector('.nav-sections');
+    if (navSections) navSections.after(utility);
+    else nav.append(utility);
+  }
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -191,23 +257,34 @@ export default async function decorate(block) {
   block.textContent = '';
   const nav = document.createElement('nav');
   nav.id = 'nav';
-  while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i];
-    if (section) section.classList.add(`nav-${c}`);
+  // pull the fragment sections out into a working list before we re-home them
+  const sources = [...fragment.children];
+  const [alertSrc, brandSrc, sectionsSrc, toolsSrc, utilitySrc] = sources;
+
+  // classify each fragment section
+  const classes = ['alert', 'brand', 'sections', 'tools', 'utility'];
+  sources.forEach((section, i) => {
+    if (section && classes[i]) section.classList.add(`nav-${classes[i]}`);
   });
 
-  const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  // --- brand: swap in the on-brand (same-origin, white) logo ---
+  const navBrand = brandSrc;
+  if (navBrand) {
+    const brandLink = navBrand.querySelector('a');
+    // undo any button auto-decoration on the brand link
+    stripButtons(navBrand);
+    if (brandLink) {
+      const label = brandLink.textContent.trim() || 'Solstice';
+      brandLink.setAttribute('aria-label', label);
+      brandLink.innerHTML = `<img class="nav-logo" src="${codeBase}/icons/solstice-logo.png" alt="${label}">`;
+    }
   }
 
-  const navSections = nav.querySelector('.nav-sections');
+  // --- sections: render as plain text links (no pill buttons) ---
+  const navSections = sectionsSrc;
   if (navSections) {
+    stripButtons(navSections);
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
       navSection.addEventListener('click', () => {
@@ -220,12 +297,41 @@ export default async function decorate(block) {
     });
   }
 
-  const navTools = nav.querySelector('.nav-tools');
+  // --- tools: search control ---
+  const navTools = toolsSrc;
   if (navTools) {
-    const search = navTools.querySelector('a[href*="search"]');
-    if (search && search.textContent === '') {
-      search.setAttribute('aria-label', 'Search');
+    stripButtons(navTools);
+    const search = navTools.querySelector('a[href*="search"]') || navTools.querySelector('a');
+    if (search) {
+      const labelText = search.textContent.trim();
+      ensureLeadingIcon(search, 'search');
+      // wrap the visible label so it can be hidden on mobile (icon-only)
+      const iconSpan = search.querySelector('.icon');
+      search.textContent = '';
+      search.append(iconSpan);
+      if (labelText) {
+        const label = document.createElement('span');
+        label.className = 'nav-label';
+        label.textContent = labelText;
+        search.append(label);
+      }
+      search.setAttribute('aria-label', labelText || 'Search');
     }
+  }
+
+  // --- utility: add the language globe + flag the sign-in affordance ---
+  const navUtility = utilitySrc;
+  if (navUtility) {
+    stripButtons(navUtility);
+    navUtility.querySelectorAll('a').forEach((a) => {
+      const text = a.textContent.trim().toLowerCase();
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('#lang') || href.includes('language') || /\(en\)|united states/.test(text)) {
+        ensureLeadingIcon(a, 'globe');
+        a.classList.add('nav-language');
+      }
+      if (text === 'sign in') a.classList.add('nav-signin');
+    });
   }
 
   // hamburger for mobile
@@ -235,15 +341,51 @@ export default async function decorate(block) {
       <span class="nav-hamburger-icon"></span>
     </button>`;
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
-  nav.prepend(hamburger);
-  nav.setAttribute('aria-expanded', 'false');
-  // prevent mobile nav behavior on window resize
-  toggleMenu(nav, navSections, isDesktop.matches);
-  isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
 
+  // assemble the main (purple) bar: hamburger, brand, sections, tools
+  nav.append(hamburger);
+  if (navBrand) nav.append(navBrand);
+  if (navSections) nav.append(navSections);
+  if (navTools) nav.append(navTools);
+
+  nav.setAttribute('aria-expanded', 'false');
+
+  // build the band wrappers — each band is full-bleed (background) with an
+  // inner element constrained to the page width.
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
-  navWrapper.append(nav);
+
+  const makeBand = (modifier, inner) => {
+    const band = document.createElement('div');
+    band.className = `nav-bar nav-bar-${modifier}`;
+    const wrap = document.createElement('div');
+    wrap.className = 'nav-bar-inner';
+    wrap.append(...inner);
+    band.append(wrap);
+    return band;
+  };
+
+  // band 1: alert (black)
+  if (alertSrc) navWrapper.append(makeBand('alert', [alertSrc]));
+
+  // band 2: utility (black) — cart lives here; links are placed responsively
+  const utilityBar = makeBand('utility', [buildCart()]);
+  navWrapper.append(utilityBar);
+  const utilityInner = utilityBar.querySelector('.nav-bar-inner');
+
+  // band 3: main (purple)
+  navWrapper.append(makeBand('main', [nav]));
+
+  // place utility links for the current breakpoint
+  placeUtility(nav, utilityInner, navUtility);
+
+  // prevent mobile nav behavior on window resize
+  toggleMenu(nav, navSections, isDesktop.matches);
+  isDesktop.addEventListener('change', () => {
+    placeUtility(nav, utilityInner, navUtility);
+    toggleMenu(nav, navSections, isDesktop.matches);
+  });
+
   block.append(navWrapper);
 
   if (getMetadata('breadcrumbs').toLowerCase() === 'true') {
