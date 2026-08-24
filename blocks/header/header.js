@@ -268,17 +268,11 @@ export default async function decorate(block) {
     if (section && classes[i]) section.classList.add(`nav-${classes[i]}`);
   });
 
-  // --- brand: swap in the on-brand (same-origin, white) logo ---
+  // --- brand: the logo image is authored in the nav content and optimized by
+  // the pipeline; just clean up any auto-button decoration on the brand link ---
   const navBrand = brandSrc;
   if (navBrand) {
-    const brandLink = navBrand.querySelector('a');
-    // undo any button auto-decoration on the brand link
     stripButtons(navBrand);
-    if (brandLink) {
-      const label = brandLink.textContent.trim() || 'Solstice';
-      brandLink.setAttribute('aria-label', label);
-      brandLink.innerHTML = `<img class="nav-logo" src="${codeBase}/icons/solstice-logo.png" alt="${label}">`;
-    }
   }
 
   // --- sections: render as plain text links (no pill buttons) ---
