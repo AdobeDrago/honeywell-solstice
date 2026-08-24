@@ -269,16 +269,24 @@ export default async function decorate(block) {
   });
 
   // --- brand: swap in the on-brand (same-origin, white) logo ---
+  // The brand may be authored as a link, plain text, or a `:solstice-logo:`
+  // icon token; normalize any of these to a home link wrapping the logo image
+  // so it never depends on an external asset or a matching SVG icon file.
   const navBrand = brandSrc;
   if (navBrand) {
-    const brandLink = navBrand.querySelector('a');
     // undo any button auto-decoration on the brand link
     stripButtons(navBrand);
-    if (brandLink) {
-      const label = brandLink.textContent.trim() || 'Solstice';
-      brandLink.setAttribute('aria-label', label);
-      brandLink.innerHTML = `<img class="nav-logo" src="${codeBase}/icons/solstice-logo.png" alt="${label}">`;
+    const holder = navBrand.querySelector('.default-content-wrapper') || navBrand;
+    let brandLink = holder.querySelector('a');
+    const label = (brandLink && brandLink.textContent.trim()) || navBrand.textContent.trim() || 'Solstice';
+    if (!brandLink) {
+      brandLink = document.createElement('a');
+      brandLink.href = '/';
+      holder.textContent = '';
+      holder.append(brandLink);
     }
+    brandLink.setAttribute('aria-label', label);
+    brandLink.innerHTML = `<img class="nav-logo" src="${codeBase}/icons/solstice-logo.png" alt="${label}">`;
   }
 
   // --- sections: render as plain text links (no pill buttons) ---
