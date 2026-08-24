@@ -19,6 +19,8 @@ header .nav-wrapper {
    height on small screens, so a fixed bar would reserve the wrong space) */
 header {
   height: auto;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
 }
 
 /* ---- bands ---- */
@@ -29,12 +31,13 @@ header .nav-bar {
 header .nav-bar-inner {
   box-sizing: border-box;
   margin: auto;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   padding: 0 24px;
 }
 
 header .nav-bar-alert {
   background-color: var(--solstice-black);
+  border-bottom: 1px solid rgba(240, 235, 231, 0.25);
 }
 
 header .nav-bar-utility {
@@ -75,7 +78,7 @@ header .nav-bar-alert .default-content-wrapper {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   margin: auto;
   padding: 16px 24px;
   text-align: center;
@@ -349,8 +352,9 @@ header nav .nav-tools a {
 }
 
 header nav .nav-tools .icon {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
+  padding-left: 10px;
 }
 
 /* the search label is icon-only on mobile, text+icon on desktop */
@@ -450,6 +454,10 @@ header nav .nav-utility ul {
   header .nav-bar-utility .nav-bar-inner {
     min-height: 34px;
   }
+
+  header .nav-bar-alert h4 {
+    font-size: 16px;
+  }
 }
 
 /* =====================================================================
@@ -461,11 +469,17 @@ header nav .nav-utility ul {
     align-items: center;
     justify-content: space-between;
     gap: 0 32px;
-    padding: 0;
+    padding: 2rem 0;
   }
 
   header .nav-bar-inner {
     padding: 0 32px;
+  }
+
+  header .nav-bar-utility .nav-bar-inner,
+  header .nav-bar-main .nav-bar-inner {
+    max-width: var(--inner-content-max-width);
+    box-sizing: border-box;
   }
 
   /* alert becomes a single justified row on desktop */
@@ -476,6 +490,8 @@ header nav .nav-utility ul {
     gap: 16px 32px;
     padding: 12px 32px;
     text-align: left;
+    max-width: var(--inner-content-max-width);
+    box-sizing: border-box;
   }
 
   header .nav-hamburger {
@@ -503,8 +519,8 @@ header nav .nav-utility ul {
   header nav .nav-sections .default-content-wrapper > ul {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 28px;
+    justify-content: flex-end;
+    gap: 3rem;
     margin: 0;
   }
 
@@ -512,6 +528,10 @@ header nav .nav-utility ul {
     flex: 0 1 auto;
     position: relative;
     font-weight: 500;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li > p {
+    margin: 0;
   }
 
   header nav .nav-sections .nav-drop {
@@ -524,7 +544,7 @@ header nav .nav-utility ul {
     content: '';
     display: inline-block;
     position: absolute;
-    top: 0.45em;
+    top: 7px;
     right: 2px;
     transform: rotate(135deg);
     width: 6px;
@@ -550,7 +570,7 @@ header nav .nav-utility ul {
     position: absolute;
     left: -24px;
     width: 240px;
-    top: 200%;
+    top: 100%;
     padding: 16px;
     background-color: #fff;
     border-radius: 8px;
@@ -599,7 +619,7 @@ header nav .nav-utility ul {
    ===================================================================== */
 header .breadcrumbs {
   margin: auto;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   padding: 8px 24px;
   font-size: var(--body-font-size-xs);
   color: var(--text-color);

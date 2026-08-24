@@ -26,7 +26,7 @@ main > .section > .breadcrumbs-wrapper {
 .breadcrumbs.block nav {
   box-sizing: border-box;
   margin: auto;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   padding: 14px 24px;
 }
 
@@ -94,5 +94,6 @@ main > .section > .breadcrumbs-wrapper {
 @media (width >= 900px) {
   .breadcrumbs.block nav {
     padding: 14px 32px;
+    max-width: var(--inner-content-max-width);
   }
 }

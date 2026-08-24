@@ -12,16 +12,16 @@
 
 :root {
   /* colors */
-  --background-color: white;
+  --background-color: #f0ebe7;
   --light-color: #f8f8f8;
   --dark-color: #505050;
   --text-color: #131313;
   --link-color: #3b63fb;
   --link-hover-color: #1d3ecf;
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* fonts — Solstice brand fonts (body: Solstice Sans, headings: Poppins) */
+  --body-font-family: 'Solstice Sans', roboto, roboto-fallback, sans-serif;
+  --heading-font-family: 'Poppins', roboto, roboto-fallback, sans-serif;
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -40,6 +40,10 @@
   --nav-height: 64px;
   --breadcrumbs-height: 34px;
   --header-height: var(--nav-height);
+
+  /* shared content width (header, footer, main sections) */
+  --content-max-width: 1600px;
+  --inner-content-max-width: 1480px;
 }
 
 /* fallback fonts */
@@ -100,6 +104,11 @@ footer .footer[data-block-status="loaded"] {
   visibility: visible;
 }
 
+main {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
 @media (width >= 900px) {
   body[data-breadcrumbs] {
     --header-height: calc(var(--nav-height) + var(--breadcrumbs-height));
@@ -113,7 +122,7 @@ h4,
 h5,
 h6 {
   margin-top: 0.8em;
-  margin-bottom: 0.25em;
+  margin-bottom: 0.8em;
   font-family: var(--heading-font-family);
   font-weight: 600;
   line-height: 1.25;
@@ -240,7 +249,8 @@ main > .section {
 }
 
 main > .section > div {
-  max-width: 1200px;
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
   margin: auto;
   padding: 0 24px;
 }
