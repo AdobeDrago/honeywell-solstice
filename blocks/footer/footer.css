@@ -65,7 +65,6 @@ footer .footer-logo {
 footer .footer-logo img {
   width: 150px;
   height: auto;
-  filter: brightness(0) invert(1); /* force cream artwork to pure white */
 }
 
 footer .footer-contact .default-content-wrapper > p:nth-child(2) {

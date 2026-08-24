@@ -34,22 +34,22 @@ export default async function decorate(block) {
     if (columnClasses[i]) col.classList.add(columnClasses[i]);
   });
 
-  // contact column: same-origin white logo on top + address anchored to bottom
+  // contact column: authored logo on top + address anchored to bottom
   const contact = footer.querySelector('.footer-contact');
   if (contact) {
-    // drop any broken/external logo authored in content
-    contact.querySelectorAll('picture, img').forEach((el) => (el.closest('p') || el).remove());
+    const dcw = contact.querySelector('.default-content-wrapper');
 
-    const logo = document.createElement('a');
-    logo.className = 'footer-logo';
-    logo.href = '/';
-    logo.setAttribute('aria-label', 'Solstice home');
-    logo.innerHTML = `<img src="${codeBase}/icons/solstice-logo.png" alt="Solstice" loading="lazy">`;
-    contact.prepend(logo);
+    // Promote an authored logo image (if any) out of the content flow so it
+    // sits atop the column. The image itself comes from the footer content and
+    // is optimized by the pipeline — no hardcoded asset.
+    const logoHost = dcw && [...dcw.children].find((el) => el.querySelector('picture, img'));
+    if (logoHost) {
+      logoHost.classList.add('footer-logo');
+      contact.prepend(logoHost);
+    }
 
     // group the address lines (everything after the CONTACT US button) so they
     // can be pinned to the bottom of the column
-    const dcw = contact.querySelector('.default-content-wrapper');
     const button = dcw?.querySelector('.button-container');
     if (button) {
       const address = document.createElement('div');
