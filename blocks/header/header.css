@@ -288,10 +288,9 @@ header .nav-brand a {
   align-items: center;
 }
 
-header .nav-brand img.nav-logo {
+header .nav-brand img {
   width: auto;
   height: 30px;
-  filter: brightness(0) invert(1); /* force cream source artwork to pure white */
 }
 
 /* sections (main menu) */
@@ -489,7 +488,7 @@ header nav .nav-utility ul {
     flex: 0 0 auto;
   }
 
-  header .nav-brand img.nav-logo {
+  header .nav-brand img {
     height: 34px;
   }
 
