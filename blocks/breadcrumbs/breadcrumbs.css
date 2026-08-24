@@ -26,7 +26,7 @@ main > .section > .breadcrumbs-wrapper {
 .breadcrumbs.block nav {
   box-sizing: border-box;
   margin: auto;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   padding: 14px 24px;
 }
 

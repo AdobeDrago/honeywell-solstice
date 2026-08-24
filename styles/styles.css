@@ -12,7 +12,7 @@
 
 :root {
   /* colors */
-  --background-color: white;
+  --background-color: #f0ebe7;
   --light-color: #f8f8f8;
   --dark-color: #505050;
   --text-color: #131313;
@@ -40,6 +40,9 @@
   --nav-height: 64px;
   --breadcrumbs-height: 34px;
   --header-height: var(--nav-height);
+
+  /* shared content width (header, footer, main sections) */
+  --content-max-width: 1600px;
 }
 
 /* fallback fonts */
@@ -98,6 +101,11 @@ footer .footer {
 header .header[data-block-status="loaded"],
 footer .footer[data-block-status="loaded"] {
   visibility: visible;
+}
+
+main {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
 }
 
 @media (width >= 900px) {
@@ -240,7 +248,8 @@ main > .section {
 }
 
 main > .section > div {
-  max-width: 1200px;
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
   margin: auto;
   padding: 0 24px;
 }

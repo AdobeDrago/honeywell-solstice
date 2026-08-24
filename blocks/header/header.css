@@ -19,6 +19,8 @@ header .nav-wrapper {
    height on small screens, so a fixed bar would reserve the wrong space) */
 header {
   height: auto;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
 }
 
 /* ---- bands ---- */
@@ -29,7 +31,7 @@ header .nav-bar {
 header .nav-bar-inner {
   box-sizing: border-box;
   margin: auto;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   padding: 0 24px;
 }
 
@@ -75,7 +77,7 @@ header .nav-bar-alert .default-content-wrapper {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   margin: auto;
   padding: 16px 24px;
   text-align: center;
@@ -599,7 +601,7 @@ header nav .nav-utility ul {
    ===================================================================== */
 header .breadcrumbs {
   margin: auto;
-  max-width: 1264px;
+  max-width: var(--content-max-width);
   padding: 8px 24px;
   font-size: var(--body-font-size-xs);
   color: var(--text-color);

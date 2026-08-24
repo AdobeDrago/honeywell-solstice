@@ -2,17 +2,17 @@
 
 footer {
   --solstice-purple: #674be2;
-
-  background-color: #000;
   color: #fff;
   font-size: var(--body-font-size-xs);
   font-family: Poppins, var(--body-font-family);
 }
 
 footer .footer > div {
+  box-sizing: border-box;
   margin: auto;
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   padding: 56px 24px 24px;
+  background-color: #000;
 
   /* top area: contact + menu + quick links */
   display: grid;
