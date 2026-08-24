@@ -5,17 +5,19 @@
  * the header's built-in breadcrumb (`header .breadcrumbs`).
  */
 
+/* Let the breadcrumb span the full content width by removing the section
+   wrapper's max-width/padding. Using the content width (not 100vw) avoids the
+   scrollbar-width horizontal overflow that 100vw causes. */
+main > .section > .breadcrumbs-wrapper {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 .breadcrumbs.block {
   --bc-purple: #674be2;
 
-  /* full-bleed black band, regardless of the section's max-width */
-  position: relative;
-  left: 50%;
-  right: 50%;
-  width: 100vw;
-  max-width: 100vw;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  width: 100%;
   background-color: #000;
   color: #fff;
   font-family: Poppins, var(--body-font-family);
